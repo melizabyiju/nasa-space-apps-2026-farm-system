@@ -60,6 +60,7 @@ class FarmCreate(BaseModel):
 class AssistantQuery(BaseModel):
     query: str
     farm_id: Optional[str] = None
+    lang: Optional[str] = "en"
 
 class ScenarioRequest(BaseModel):
     farm_id: str
@@ -270,7 +271,7 @@ async def assistant_chat(payload: AssistantQuery):
         }
     
     climate = await NASAService.fetch_power_climate(farm["latitude"], farm["longitude"])
-    answer = AIAssistant.answer_query(payload.query, farm, climate)
+    answer = AIAssistant.answer_query(payload.query, farm, climate, payload.lang or "en")
     return answer
 
 # 7. Reports (CSV and Structured Export)

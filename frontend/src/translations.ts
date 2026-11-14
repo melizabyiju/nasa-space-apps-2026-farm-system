@@ -4,7 +4,7 @@ export const translations = {
   en: {
     // App header & brand
     appName: 'AGROVERSE',
-    appSubtitle: 'NASA Agricultural Intelligence',
+    appSubtitle: 'NASA Earth Observation & Crop Intelligence',
     liveNasa: 'Live NASA Satellite Feed',
     selectFarm: 'Selected Farm',
     syncNasa: 'Sync NASA Data',
@@ -92,8 +92,8 @@ export const translations = {
 
   ml: {
     // App header & brand
-    appName: 'അഗ്രോവേഴ്സ്',
-    appSubtitle: 'നാസ കാർഷിക വിവരങ്ങൾ',
+    appName: 'അഗ്രോവേഴ്സ് (AGROVERSE)',
+    appSubtitle: 'നാസ ഉപഗ്രഹ & കാർഷിക വിവരങ്ങൾ',
     liveNasa: 'നാസ ഉപഗ്രഹ വിവരങ്ങൾ തത്സമയം',
     selectFarm: 'തിരഞ്ഞെടുത്ത കൃഷിയിടം',
     syncNasa: 'നാസ വിവരങ്ങൾ പുതുക്കുക',
