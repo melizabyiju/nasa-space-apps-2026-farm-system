@@ -5,20 +5,17 @@ import {
   MapPin, 
   Plus, 
   Trash2, 
-  Layers, 
-  Droplet, 
-  Sprout, 
   Check, 
-  ShieldAlert,
-  Compass,
   ArrowRight
 } from 'lucide-react';
+import { translations, Language } from '../translations';
 
 interface FarmsViewProps {
   farms: Farm[];
   selectedFarm: Farm | null;
   onSelectFarm: (farm: Farm) => void;
   onRefreshFarms: () => void;
+  lang: Language;
 }
 
 export const FarmsView: React.FC<FarmsViewProps> = ({
@@ -26,7 +23,9 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
   selectedFarm,
   onSelectFarm,
   onRefreshFarms,
+  lang,
 }) => {
+  const t = translations[lang];
   const [showAddModal, setShowAddModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -38,7 +37,6 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
   const [areaHectares, setAreaHectares] = useState(2.5);
   const [soilType, setSoilType] = useState('Laterite Loam');
   const [soilPh, setSoilPh] = useState<number | ''>(6.0);
-  const [organicMatter, setOrganicMatter] = useState<number | ''>(1.8);
   const [irrigationType, setIrrigationType] = useState('Drip & Canal');
   const [currentCrop, setCurrentCrop] = useState('Rice (Paddy)');
   const [preferredCrops, setPreferredCrops] = useState('Rice, Cowpea, Green Gram, Banana');
@@ -55,7 +53,7 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
         area_hectares: Number(areaHectares),
         soil_type: soilType,
         soil_ph: soilPh === '' ? null : Number(soilPh),
-        organic_matter: organicMatter === '' ? null : Number(organicMatter),
+        organic_matter: 1.8,
         nitrogen_level: 'Medium',
         phosphorus_level: 'Medium',
         potassium_level: 'Medium',
@@ -67,7 +65,6 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
       });
       setShowAddModal(false);
       onRefreshFarms();
-      // Reset
       setName('');
       setLocation('');
     } catch (err) {
@@ -79,7 +76,7 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this farm profile?')) {
+    if (confirm('Are you sure you want to remove this farm profile?')) {
       await api.deleteFarm(id);
       onRefreshFarms();
     }
@@ -88,19 +85,23 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 border border-white/70 shadow-lg">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 border border-white/80 shadow-md">
         <div>
-          <h2 className="text-2xl font-extrabold text-neutral-900 tracking-tight">Farm Profiles Management</h2>
-          <p className="text-neutral-600 text-sm mt-1">
-            Configure geographic coordinates to automatically retrieve NASA Earth observation data for your parcels.
+          <h2 className="text-2xl font-extrabold text-neutral-900 tracking-tight">
+            {lang === 'ml' ? 'നിങ്ങളുടെ കൃഷിയിടങ്ങൾ' : 'My Registered Farms'}
+          </h2>
+          <p className="text-neutral-700 text-sm mt-1 font-medium">
+            {lang === 'ml' 
+              ? 'കൃഷിയിടം തെരഞ്ഞെടുക്കുമ്പോൾ നാസ ഉപഗ്രഹങ്ങൾ തത്സമയം കാലാവസ്ഥാ വിവരങ്ങൾ നൽകും.'
+              : 'Select your farm to activate instant NASA satellite climate and soil monitoring.'}
           </p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-sm shadow-md transition-all self-start sm:self-auto"
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs shadow-md transition-all self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
-          <span>Register New Farm</span>
+          <span>{lang === 'ml' ? 'പുതിയ കൃഷിയിടം ചേർക്കുക' : 'Add New Farm'}</span>
         </button>
       </div>
 
@@ -114,18 +115,18 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
               onClick={() => onSelectFarm(farm)}
               className={`glass-card p-6 flex flex-col justify-between border cursor-pointer transition-all duration-200 relative group hover:shadow-xl ${
                 isSelected
-                  ? 'border-emerald-600 ring-2 ring-emerald-600/30 shadow-lg bg-white/90'
-                  : 'border-white/70 hover:border-emerald-300'
+                  ? 'border-emerald-600 ring-2 ring-emerald-600/30 shadow-md bg-white/95'
+                  : 'border-white/80 hover:border-emerald-300 hover:bg-white/90'
               }`}
             >
               <div>
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
-                      {farm.area_hectares} Hectares
+                    <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-900 bg-emerald-100/90 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                      {farm.area_hectares} {t.hectares}
                     </span>
-                    <h3 className="text-lg font-bold text-neutral-900 mt-2">{farm.name}</h3>
-                    <p className="text-xs text-neutral-500 flex items-center gap-1 mt-0.5">
+                    <h3 className="text-xl font-extrabold text-neutral-900 mt-2">{farm.name}</h3>
+                    <p className="text-xs text-neutral-600 font-medium flex items-center gap-1 mt-0.5">
                       <MapPin className="w-3.5 h-3.5 text-neutral-400" />
                       {farm.location}
                     </p>
@@ -133,67 +134,40 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
                   <button
                     onClick={(e) => handleDelete(farm.id, e)}
                     className="p-1.5 text-neutral-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition"
-                    title="Delete farm"
+                    title="Remove farm"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Details Bento */}
-                <div className="mt-4 pt-4 border-t border-neutral-200/60 space-y-2 text-xs">
+                <div className="mt-4 pt-4 border-t border-neutral-200 space-y-2 text-xs font-medium">
                   <div className="flex justify-between py-1 border-b border-neutral-100">
-                    <span className="text-neutral-500">Coordinates:</span>
-                    <span className="font-semibold text-neutral-800">
-                      {farm.latitude.toFixed(4)}°N, {farm.longitude.toFixed(4)}°E
-                    </span>
+                    <span className="text-neutral-500">{t.soilType}:</span>
+                    <span className="font-bold text-neutral-800">{farm.soil_type}</span>
                   </div>
                   <div className="flex justify-between py-1 border-b border-neutral-100">
-                    <span className="text-neutral-500">Soil Type:</span>
-                    <span className="font-semibold text-neutral-800">{farm.soil_type}</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-neutral-100">
-                    <span className="text-neutral-500">Soil pH:</span>
-                    <span className="font-semibold text-neutral-800">
-                      {farm.soil_ph !== null ? farm.soil_ph : <span className="text-amber-600 font-normal">Missing (Unmeasured)</span>}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-neutral-100">
-                    <span className="text-neutral-500">Irrigation:</span>
-                    <span className="font-semibold text-neutral-800">{farm.irrigation_type}</span>
+                    <span className="text-neutral-500">{t.irrigation}:</span>
+                    <span className="font-bold text-neutral-800">{farm.irrigation_type}</span>
                   </div>
                   <div className="flex justify-between py-1">
-                    <span className="text-neutral-500">Current Crop:</span>
-                    <span className="font-bold text-emerald-800">{farm.current_crop}</span>
+                    <span className="text-neutral-500">{t.currentCrop}:</span>
+                    <span className="font-extrabold text-emerald-900">{farm.current_crop}</span>
                   </div>
                 </div>
-
-                {/* Preferred crops pills */}
-                {farm.preferred_crops && farm.preferred_crops.length > 0 && (
-                  <div className="mt-3">
-                    <div className="text-[10px] font-semibold uppercase text-neutral-400 mb-1.5">Preferred Crops:</div>
-                    <div className="flex flex-wrap gap-1">
-                      {farm.preferred_crops.map((pc, i) => (
-                        <span key={i} className="text-[11px] font-medium bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded-md">
-                          {pc}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
-              <div className="mt-5 pt-3 border-t border-neutral-200/50 flex items-center justify-between">
+              <div className="mt-5 pt-3 border-t border-neutral-200 flex items-center justify-between">
                 {isSelected ? (
-                  <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-800">
+                  <span className="flex items-center gap-1.5 text-xs font-extrabold text-emerald-800">
                     <Check className="w-4 h-4 text-emerald-600" />
-                    Currently Selected
+                    {lang === 'ml' ? 'നിലവിൽ തിരഞ്ഞെടുത്തു' : 'Currently Active'}
                   </span>
                 ) : (
-                  <span className="text-xs font-medium text-neutral-500 group-hover:text-emerald-700 flex items-center gap-1">
-                    Select for Dashboard <ArrowRight className="w-3.5 h-3.5" />
+                  <span className="text-xs font-bold text-neutral-600 group-hover:text-emerald-800 flex items-center gap-1">
+                    {lang === 'ml' ? 'ഇത് തിരഞ്ഞെടുക്കുക' : 'Select Farm'} <ArrowRight className="w-3.5 h-3.5" />
                   </span>
                 )}
-                <span className="text-[11px] text-neutral-400">NASA Grid: Active</span>
+                <span className="text-[11px] text-neutral-400 font-semibold">NASA Tracked</span>
               </div>
             </div>
           );
@@ -202,81 +176,83 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
 
       {/* Add Farm Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="glass-card bg-white/95 max-w-lg w-full p-6 border border-white/80 shadow-2xl rounded-3xl max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-neutral-900 mb-1">Register New Farm</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs">
+          <div className="glass-card bg-white max-w-lg w-full p-6 border border-neutral-200 shadow-2xl rounded-3xl max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-extrabold text-neutral-900 mb-1">
+              {lang === 'ml' ? 'പുതിയ കൃഷിയിടം രജിസ്റ്റർ ചെയ്യുക' : 'Register New Farm'}
+            </h3>
             <p className="text-xs text-neutral-500 mb-5">
-              Enter farm properties. NASA Earth data will be automatically retrieved for coordinates.
+              Enter your location. NASA Earth data will be connected automatically.
             </p>
 
             <form onSubmit={handleCreateFarm} className="space-y-4 text-xs font-medium">
               <div>
-                <label className="block text-neutral-700 mb-1 font-semibold">Farm Name *</label>
+                <label className="block text-neutral-700 mb-1 font-bold">Farm Name *</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Malabar Spice Garden"
+                  placeholder="e.g. Alappuzha Paddy Land"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
+                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
                 />
               </div>
 
               <div>
-                <label className="block text-neutral-700 mb-1 font-semibold">Location / District *</label>
+                <label className="block text-neutral-700 mb-1 font-bold">Location / District *</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Kozhikode, Kerala, India"
+                  placeholder="e.g. Alappuzha, Kerala"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
+                  className="w-full px-3 py-2.5 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-neutral-700 mb-1 font-semibold">Latitude (°N) *</label>
+                  <label className="block text-neutral-700 mb-1 font-bold">Latitude *</label>
                   <input
                     type="number"
                     step="0.0001"
                     required
                     value={latitude}
                     onChange={(e) => setLatitude(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-neutral-700 mb-1 font-semibold">Longitude (°E) *</label>
+                  <label className="block text-neutral-700 mb-1 font-bold">Longitude *</label>
                   <input
                     type="number"
                     step="0.0001"
                     required
                     value={longitude}
                     onChange={(e) => setLongitude(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-neutral-700 mb-1 font-semibold">Area (Hectares) *</label>
+                  <label className="block text-neutral-700 mb-1 font-bold">Area ({t.hectares}) *</label>
                   <input
                     type="number"
                     step="0.1"
                     required
                     value={areaHectares}
                     onChange={(e) => setAreaHectares(Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-neutral-700 mb-1 font-semibold">Soil Type *</label>
+                  <label className="block text-neutral-700 mb-1 font-bold">Soil Type *</label>
                   <select
                     value={soilType}
                     onChange={(e) => setSoilType(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white"
                   >
                     <option value="Laterite Loam">Laterite Loam</option>
                     <option value="Red Sandy Loam">Red Sandy Loam</option>
@@ -289,69 +265,42 @@ export const FarmsView: React.FC<FarmsViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-neutral-700 mb-1 font-semibold">
-                    Soil pH (Leave empty if unknown)
-                  </label>
+                  <label className="block text-neutral-700 mb-1 font-bold">Current Crop</label>
                   <input
-                    type="number"
-                    step="0.1"
-                    placeholder="e.g. 6.2"
-                    value={soilPh}
-                    onChange={(e) => setSoilPh(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
+                    type="text"
+                    value={currentCrop}
+                    onChange={(e) => setCurrentCrop(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white"
                   />
                 </div>
                 <div>
-                  <label className="block text-neutral-700 mb-1 font-semibold">Irrigation Availability</label>
+                  <label className="block text-neutral-700 mb-1 font-bold">Water Access</label>
                   <select
                     value={irrigationType}
                     onChange={(e) => setIrrigationType(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
+                    className="w-full px-3 py-2 rounded-xl border border-neutral-300 bg-white"
                   >
                     <option value="Drip & Canal">Drip & Canal</option>
-                    <option value="Rainfed (No Irrigation)">Rainfed (No Irrigation)</option>
-                    <option value="Borewell Sprinkler">Borewell Sprinkler</option>
-                    <option value="Canal Flood">Canal Flood</option>
+                    <option value="Rainfed (Monsoon Only)">Rainfed (Monsoon Only)</option>
+                    <option value="Sprinkler & Borewell">Sprinkler & Borewell</option>
                   </select>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-neutral-700 mb-1 font-semibold">Current Crop</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Rice (Paddy)"
-                  value={currentCrop}
-                  onChange={(e) => setCurrentCrop(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-neutral-700 mb-1 font-semibold">Preferred Crops (Comma-separated)</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Rice, Cowpea, Green Gram, Banana"
-                  value={preferredCrops}
-                  onChange={(e) => setPreferredCrops(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-neutral-300 focus:outline-none focus:border-emerald-600 bg-white"
-                />
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-neutral-200">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 rounded-xl bg-neutral-100 hover:bg-neutral-200 text-neutral-700 font-semibold"
+                  className="px-4 py-2 rounded-xl bg-neutral-100 text-neutral-700 font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-semibold shadow-md disabled:opacity-50"
+                  className="px-5 py-2 rounded-xl bg-emerald-800 text-white font-bold shadow-md disabled:opacity-50"
                 >
-                  {isSubmitting ? 'Registering...' : 'Save Farm'}
+                  {isSubmitting ? 'Saving...' : 'Save Farm'}
                 </button>
               </div>
             </form>
