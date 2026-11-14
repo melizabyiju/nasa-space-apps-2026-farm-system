@@ -131,11 +131,13 @@ export const CropExplorerView: React.FC<CropExplorerViewProps> = ({ crops, lang 
                 <img
                   src={imgSrc}
                   alt={crop.name}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     e.currentTarget.onerror = null;
                     e.currentTarget.src = '/crops/rice.jpg';
                   }}
-                  className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover shrink-0 shadow-xs border border-neutral-200"
+                  className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl object-cover shrink-0 shadow-xs border border-neutral-200 bg-neutral-100"
                 />
 
                 <div className="flex-1 min-w-0">
