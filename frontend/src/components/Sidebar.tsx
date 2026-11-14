@@ -58,8 +58,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     >
       {/* Brand Header */}
       <div className="flex items-center gap-3 px-2 py-3 mb-3 border-b border-neutral-200/60 w-full shrink-0">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-800 to-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-900/20 shrink-0">
-          <Sprout className="w-6 h-6 text-emerald-100" />
+        <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-md shadow-emerald-950/20 shrink-0 border border-emerald-500/20">
+          <img src="/favicon.svg" alt="AGROVERSE" className="w-full h-full object-cover" />
         </div>
         {!collapsed && (
           <div className="overflow-hidden">

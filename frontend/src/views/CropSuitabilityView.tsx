@@ -134,6 +134,10 @@ export const CropSuitabilityView: React.FC<CropSuitabilityViewProps> = ({ farm, 
                     <img
                       src={imgSrc}
                       alt={item.crop_name}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/crops/rice.jpg';
+                      }}
                       className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover shadow-xs border border-neutral-200 shrink-0"
                     />
 

@@ -78,18 +78,17 @@ export const App: React.FC = () => {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden flex bg-neutral-100 font-sans">
-      {/* Aerial Kerala Paddy Landscape with coconut trees and Western Ghats: 18% opacity, subtle blur */}
+      {/* FarmFlow Scenic Countryside & Farmhouse Background with subtle transparency */}
       <div 
-        className="fixed inset-0 z-0 bg-cover bg-center pointer-events-none transition-opacity duration-1000"
+        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat pointer-events-none transition-opacity duration-700"
         style={{
-          backgroundImage: 'url(/kerala-paddy-bg.jpg)',
-          opacity: 0.18,
-          filter: 'blur(2px)',
+          backgroundImage: 'url(/farmflow-bg.jpg)',
+          opacity: 0.22,
         }}
       />
 
-      {/* Light warm overlay for crystal clear contrast and readability */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-br from-emerald-950/5 via-white/40 to-amber-950/5 pointer-events-none" />
+      {/* Light subtle overlay preserving crystal clear glass card readability */}
+      <div className="fixed inset-0 z-0 bg-gradient-to-br from-white/30 via-transparent to-emerald-950/5 pointer-events-none" />
 
       {/* Stationary Left Sidebar: stays in place while user browses */}
       <Sidebar
