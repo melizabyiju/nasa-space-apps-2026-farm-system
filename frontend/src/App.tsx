@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Farm, NASAClimateData, Crop } from './types';
 import { api } from './api';
+import { DEFAULT_FARMS, FALLBACK_CLIMATE, DEFAULT_CROPS } from './fallbackData';
 import { Sidebar } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
 import { translations, Language } from './translations';
@@ -26,23 +27,30 @@ export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
-  // Core Data
-  const [farms, setFarms] = useState<Farm[]>([]);
-  const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
-  const [climateData, setClimateData] = useState<NASAClimateData | null>(null);
-  const [crops, setCrops] = useState<Crop[]>([]);
+  // Core Data initialized immediately with valid fallback data for zero initial render lag
+  const [farms, setFarms] = useState<Farm[]>(DEFAULT_FARMS);
+  const [selectedFarm, setSelectedFarm] = useState<Farm>(DEFAULT_FARMS[0]);
+  const [climateData, setClimateData] = useState<NASAClimateData>(FALLBACK_CLIMATE);
+  const [crops, setCrops] = useState<Crop[]>(DEFAULT_CROPS);
   const [loadingNASA, setLoadingNASA] = useState<boolean>(false);
 
-  // Initial load
+  // Initial load: sync fresh data quietly in background
   useEffect(() => {
     api.getFarms().then((fList) => {
-      setFarms(fList);
-      if (fList.length > 0) {
-        setSelectedFarm(fList[0]);
+      if (Array.isArray(fList) && fList.length > 0) {
+        setFarms(fList);
+        setSelectedFarm((prev) => {
+          const match = fList.find((f) => f.id === prev.id);
+          return match || fList[0];
+        });
       }
     }).catch(console.error);
 
-    api.getCrops().then(setCrops).catch(console.error);
+    api.getCrops().then((cList) => {
+      if (Array.isArray(cList) && cList.length > 0) {
+        setCrops(cList);
+      }
+    }).catch(console.error);
   }, []);
 
   // Fetch NASA data whenever selectedFarm changes
@@ -50,7 +58,9 @@ export const App: React.FC = () => {
     if (selectedFarm) {
       setLoadingNASA(true);
       api.getNASAClimate(selectedFarm.latitude, selectedFarm.longitude)
-        .then(setClimateData)
+        .then((data) => {
+          if (data) setClimateData(data);
+        })
         .catch(console.error)
         .finally(() => setLoadingNASA(false));
     }

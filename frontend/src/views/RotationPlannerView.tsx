@@ -29,6 +29,7 @@ import {
 } from 'recharts';
 import { translations, Language } from '../translations';
 import { speakText, stopSpeech } from '../voiceUtils';
+import { DEFAULT_ROTATION_STRATEGIES } from '../fallbackData';
 
 interface RotationPlannerViewProps {
   farm: Farm;
@@ -42,22 +43,18 @@ export const RotationPlannerView: React.FC<RotationPlannerViewProps> = ({
   lang 
 }) => {
   const t = translations[lang];
-  const [strategies, setStrategies] = useState<RotationStrategy[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [strategies, setStrategies] = useState<RotationStrategy[]>(DEFAULT_ROTATION_STRATEGIES);
+  const [loading, setLoading] = useState(false);
   const [selectedStrategyId, setSelectedStrategyId] = useState<string>('strat-soil-regeneration');
   const [compareMode, setCompareMode] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
     api.getRotationStrategies(farm.id)
       .then((data) => {
-        if (isMounted) {
+        if (isMounted && data.strategies) {
           setStrategies(data.strategies);
-          if (data.strategies.length > 0) {
-            setSelectedStrategyId(data.strategies[0].id);
-          }
         }
       })
       .catch(console.error)

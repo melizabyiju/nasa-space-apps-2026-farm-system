@@ -16,6 +16,7 @@ import {
 import { getCropImage } from '../cropImages';
 import { translations, Language } from '../translations';
 import { speakText, stopSpeech } from '../voiceUtils';
+import { DEFAULT_SUITABILITY } from '../fallbackData';
 
 interface CropSuitabilityViewProps {
   farm: Farm;
@@ -24,21 +25,17 @@ interface CropSuitabilityViewProps {
 
 export const CropSuitabilityView: React.FC<CropSuitabilityViewProps> = ({ farm, lang }) => {
   const t = translations[lang];
-  const [rankings, setRankings] = useState<CropSuitability[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [expandedCropId, setExpandedCropId] = useState<string | null>(null);
+  const [rankings, setRankings] = useState<CropSuitability[]>(DEFAULT_SUITABILITY);
+  const [loading, setLoading] = useState(false);
+  const [expandedCropId, setExpandedCropId] = useState<string | null>(DEFAULT_SUITABILITY[0]?.crop_id || null);
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
-    setLoading(true);
     api.getCropSuitability(farm.id)
       .then((data) => {
-        if (isMounted) {
+        if (isMounted && data.suitability_ranking) {
           setRankings(data.suitability_ranking);
-          if (data.suitability_ranking.length > 0) {
-            setExpandedCropId(data.suitability_ranking[0].crop_id);
-          }
         }
       })
       .catch(console.error)
