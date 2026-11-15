@@ -4,7 +4,12 @@ import sqlite3
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "agroverse.db")
+DB_PATH = os.path.join(os.path.dirname(__file__), "sky2soil.db")
+# Migrate legacy db name if needed
+_legacy_db = os.path.join(os.path.dirname(__file__), "agroverse.db")
+if os.path.exists(_legacy_db) and not os.path.exists(DB_PATH):
+    import shutil
+    shutil.copyfile(_legacy_db, DB_PATH)
 
 def get_connection():
     conn = sqlite3.connect(DB_PATH)
@@ -59,6 +64,39 @@ def init_db():
         created_at TEXT NOT NULL
     )
     """)
+
+    # Users table
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        role TEXT NOT NULL,
+        initials TEXT NOT NULL,
+        email TEXT,
+        phone TEXT,
+        farm_name TEXT,
+        is_default INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL
+    )
+    """)
+
+    # Seed default user if empty
+    cursor.execute("SELECT COUNT(*) as count FROM users")
+    if cursor.fetchone()["count"] == 0:
+        cursor.execute("""
+        INSERT INTO users (id, name, role, initials, email, phone, farm_name, is_default, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            "default-kristin",
+            "Kristin P.",
+            "Farmer / Agronomist",
+            "KP",
+            "kristin.p@sky2soil.farm",
+            "+91 98470 12345",
+            "Wayanad Highland Agrofarm",
+            1,
+            datetime.utcnow().isoformat()
+        ))
     
     # Seed default farm if empty
     cursor.execute("SELECT COUNT(*) as count FROM farms")

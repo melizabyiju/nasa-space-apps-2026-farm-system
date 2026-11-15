@@ -4,6 +4,7 @@ import { api } from './api';
 import { Sidebar } from './components/Sidebar';
 import { Navbar } from './components/Navbar';
 import { translations, Language } from './translations';
+import { UserAccount, getActiveUser } from './userAccounts';
 
 // Views
 import { OverviewView } from './views/OverviewView';
@@ -21,6 +22,7 @@ export const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('en');
   const t = translations[lang];
 
+  const [currentUser, setCurrentUser] = useState<UserAccount>(getActiveUser());
   const [activeTab, setActiveTab] = useState<string>('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
 
@@ -106,11 +108,11 @@ export const App: React.FC = () => {
           farms={farms}
           selectedFarm={selectedFarm}
           onSelectFarm={setSelectedFarm}
-          onRefreshNASA={handleRefreshNASA}
-          isRefreshing={loadingNASA}
           activeTabTitle={tabTitle}
           lang={lang}
           onToggleLang={setLang}
+          currentUser={currentUser}
+          onUserChanged={setCurrentUser}
         />
 
         {/* Scrollable Content Pane ONLY */}
@@ -165,7 +167,7 @@ export const App: React.FC = () => {
               )}
 
               {activeTab === 'assistant' && (
-                <AssistantView farm={selectedFarm} lang={lang} />
+                <AssistantView farm={selectedFarm} lang={lang} currentUser={currentUser} />
               )}
 
               {activeTab === 'reports' && (

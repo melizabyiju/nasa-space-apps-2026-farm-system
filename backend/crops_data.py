@@ -1,5 +1,5 @@
 """
-Crops Knowledge Base for AGROVERSE
+Crops Knowledge Base for Sky2Soil
 Curated using authoritative research from:
 - ICAR (Indian Council of Agricultural Research)
 - Kerala Agricultural University (KAU) Package of Practices

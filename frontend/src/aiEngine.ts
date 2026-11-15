@@ -9,8 +9,8 @@ export interface AIResponse {
 }
 
 /**
- * AGROVERSE Client-Side Agricultural Reasoning Engine
- * Grounded in NASA Earth Observation Data & ICAR/KAU Agronomic Science
+ * Sky2Soil Client-Side Agricultural Reasoning Engine
+ * Grounded in Earth Observation Data & ICAR/KAU Agronomic Science
  */
 export function getLocalAIResponse(query: string, farm: Farm, lang: Language): AIResponse {
   const q = query.toLowerCase().trim();

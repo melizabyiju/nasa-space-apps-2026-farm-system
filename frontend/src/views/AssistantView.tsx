@@ -20,10 +20,12 @@ import {
 } from 'lucide-react';
 import { translations, Language } from '../translations';
 import { speakText, stopSpeech } from '../voiceUtils';
+import { UserAccount } from '../userAccounts';
 
 interface AssistantViewProps {
   farm: Farm;
   lang: Language;
+  currentUser?: UserAccount;
 }
 
 interface Message {
@@ -33,12 +35,13 @@ interface Message {
   dataSources?: string[];
 }
 
-export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
+export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang, currentUser }) => {
   const t = translations[lang];
+  const userName = currentUser?.name || (lang === 'ml' ? 'കർഷക സുഹൃത്തേ' : 'Farmer');
 
   const defaultWelcome = lang === 'ml'
-    ? `നമസ്കാരം! ഞാൻ നിങ്ങളുടെ **അഗ്രോവേഴ്സ് (AGROVERSE) കാർഷിക ശാസ്ത്ര സഹായിയാണ്**. **${farm.name}**-ലെ മണ്ണ് വിവരങ്ങളും (${farm.soil_type}, pH ${farm.soil_ph}) നാസ (NASA) ഉപഗ്രഹ കാലാവസ്ഥാ വിവരങ്ങളും അടിസ്ഥാനമാക്കി കൃത്യമായ കാർഷിക നിർദ്ദേശങ്ങൾ നൽകാൻ ഞാൻ തയ്യാറാണ്.\n\nതാഴെ നൽകിയിരിക്കുന്ന ചോദ്യങ്ങളിൽ ക്ലിക്ക് ചെയ്യുകയോ അല്ലെങ്കിൽ നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്യുകയോ സംസാരിക്കുകയോ ചെയ്യാം.`
-    : `Hello! I am your **AGROVERSE Agricultural AI Assistant & Agronomist**. I have synthesized real NASA Earth observations and soil characteristics (${farm.soil_type}, pH ${farm.soil_ph}) for **${farm.name}**.\n\nYou can speak or type any question regarding crop rotation, biological nitrogen fixation, fertilizer doses, pest control, or drought resilience.`;
+    ? `നമസ്കാരം ${userName}! ഞാൻ നിങ്ങളുടെ **Sky2Soil (സ്കൈ2സോയിൽ) കാർഷിക ശാസ്ത്ര സഹായിയാണ്**. **${farm.name}**-ലെ മണ്ണ് വിവരങ്ങളും (${farm.soil_type}, pH ${farm.soil_ph}) ഉപഗ്രഹ കാലാവസ്ഥാ വിവരങ്ങളും അടിസ്ഥാനമാക്കി കൃത്യമായ കാർഷിക നിർദ്ദേശങ്ങൾ നൽകാൻ ഞാൻ തയ്യാറാണ്.\n\nതാഴെ നൽകിയിരിക്കുന്ന ചോദ്യങ്ങളിൽ ക്ലിക്ക് ചെയ്യുകയോ അല്ലെങ്കിൽ നിങ്ങളുടെ ചോദ്യം ടൈപ്പ് ചെയ്യുകയോ സംസാരിക്കുകയോ ചെയ്യാം.`
+    : `Hello ${userName}! I am your **Sky2Soil Agricultural AI Assistant & Agronomist**. I have synthesized real satellite Earth observations and soil characteristics (${farm.soil_type}, pH ${farm.soil_ph}) for **${farm.name}**.\n\nYou can speak or type any question regarding crop rotation, biological nitrogen fixation, fertilizer doses, pest control, or drought resilience.`;
 
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -58,6 +61,8 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
   const [loading, setLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [autoVoice, setAutoVoice] = useState(false); // Voice is NOT default, can be chosen
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -174,9 +179,11 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
       };
       setMessages(prev => [...prev, botMsg]);
 
-      // Auto-read response for farmer accessibility
-      speakText(res.response, lang);
-      setIsSpeaking(true);
+      // Only speak if user explicitly turned on auto-voice (Voice is NOT default)
+      if (autoVoice) {
+        speakText(res.response, lang);
+        setIsSpeaking(true);
+      }
     } catch {
       const fallback = getLocalAIResponse(q, farm, lang);
       setMessages(prev => [...prev, {
@@ -185,8 +192,25 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
         citations: fallback.citations,
         dataSources: fallback.data_sources_referenced
       }]);
+      if (autoVoice) {
+        speakText(fallback.response, lang);
+        setIsSpeaking(true);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleSpeech = (text: string, idx: number) => {
+    if (speakingIndex === idx && isSpeaking) {
+      stopSpeech();
+      setIsSpeaking(false);
+      setSpeakingIndex(null);
+    } else {
+      stopSpeech();
+      speakText(text, lang);
+      setSpeakingIndex(idx);
+      setIsSpeaking(true);
     }
   };
 
@@ -199,6 +223,7 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
   const handleClearChat = () => {
     stopSpeech();
     setIsSpeaking(false);
+    setSpeakingIndex(null);
     setMessages([
       {
         role: 'assistant',
@@ -220,7 +245,7 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
           <div className="flex flex-wrap items-center gap-2 mb-1.5">
             <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-950 bg-emerald-100/90 px-3 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1.5">
               <Sparkles className="w-3 h-3 text-emerald-700" />
-              {lang === 'ml' ? 'അഗ്രോവേഴ്സ് കാർഷിക AI സഹായി' : 'AGROVERSE Agricultural AI'}
+              {lang === 'ml' ? 'Sky2Soil കാർഷിക AI സഹായി' : 'Sky2Soil Agricultural AI'}
             </span>
             <span className="text-[11px] text-emerald-800 bg-white/80 px-2.5 py-0.5 rounded-full border border-neutral-200 font-semibold flex items-center gap-1">
               <Satellite className="w-3 h-3 text-sky-600" />
@@ -240,11 +265,36 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start md:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
+          {/* Voice is NOT default: Optional Auto-Voice toggle button */}
+          <button
+            onClick={() => {
+              if (autoVoice) {
+                stopSpeech();
+                setIsSpeaking(false);
+                setSpeakingIndex(null);
+              }
+              setAutoVoice(!autoVoice);
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all shadow-xs ${
+              autoVoice
+                ? 'bg-emerald-800 text-white border-emerald-900 shadow-sm'
+                : 'bg-white/90 text-neutral-700 hover:text-emerald-900 border-neutral-300/80 hover:bg-white'
+            }`}
+            title={lang === 'ml' ? 'ഓട്ടോമാറ്റിക് ശബ്ദ വായന ഓൺ / ഓഫ് ചെയ്യുക' : 'Voice is optional: Toggle auto-reading aloud'}
+          >
+            <Volume2 className={`w-3.5 h-3.5 ${autoVoice ? 'text-white' : 'text-neutral-500'}`} />
+            <span>
+              {lang === 'ml'
+                ? (autoVoice ? 'ഓട്ടോ-വോയ്സ്: ഓൺ' : 'ഓട്ടോ-വോയ്സ്: ഓഫ്')
+                : (autoVoice ? 'Auto-Voice: ON' : 'Auto-Voice: OFF')}
+            </span>
+          </button>
+
           {isSpeaking && (
             <button
-              onClick={() => { stopSpeech(); setIsSpeaking(false); }}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition animate-pulse"
+              onClick={() => { stopSpeech(); setIsSpeaking(false); setSpeakingIndex(null); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition animate-pulse"
             >
               <VolumeX className="w-3.5 h-3.5" />
               <span>{t.stopAudio}</span>
@@ -253,7 +303,7 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
 
           <button
             onClick={handleClearChat}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/90 hover:bg-white text-neutral-700 hover:text-neutral-900 border border-neutral-300 text-xs font-semibold shadow-xs transition"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/90 hover:bg-white text-neutral-700 hover:text-neutral-900 border border-neutral-300 text-xs font-semibold shadow-xs transition"
             title="Reset conversation"
           >
             <RotateCcw className="w-3.5 h-3.5" />
@@ -315,15 +365,32 @@ export const AssistantView: React.FC<AssistantViewProps> = ({ farm, lang }) => {
                   ? 'bg-neutral-900 text-white shadow-xs'
                   : 'bg-white/95 text-neutral-800 border border-neutral-200/90 shadow-xs'
               }`}>
-                {/* Copy Button for Assistant Message */}
+                {/* Message controls: Listen/Voice on demand + Copy */}
                 {m.role === 'assistant' && (
-                  <button
-                    onClick={() => handleCopy(m.content, idx)}
-                    className="absolute top-3 right-3 p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition opacity-0 group-hover:opacity-100"
-                    title="Copy response"
-                  >
-                    {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
+                  <div className="absolute top-3 right-3 flex items-center gap-1 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleToggleSpeech(m.content, idx)}
+                      className={`p-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1 ${
+                        speakingIndex === idx && isSpeaking
+                          ? 'bg-amber-600 text-white animate-pulse shadow-xs'
+                          : 'bg-neutral-100 hover:bg-emerald-100 text-neutral-700 hover:text-emerald-900'
+                      }`}
+                      title={speakingIndex === idx && isSpeaking ? (lang === 'ml' ? 'ശബ്ദം നിർത്തുക' : 'Stop voice') : (lang === 'ml' ? 'ശബ്ദം കേൾക്കുക' : 'Read aloud (Voice)')}
+                    >
+                      {speakingIndex === idx && isSpeaking ? <VolumeX className="w-3.5 h-3.5 text-white" /> : <Volume2 className="w-3.5 h-3.5 text-emerald-700" />}
+                      <span className="text-[10px] hidden sm:inline">
+                        {speakingIndex === idx && isSpeaking ? (lang === 'ml' ? 'നിർത്തുക' : 'Stop') : (lang === 'ml' ? 'കേൾക്കുക' : 'Voice')}
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => handleCopy(m.content, idx)}
+                      className="p-1.5 rounded-lg bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition"
+                      title="Copy response"
+                    >
+                      {copiedIndex === idx ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 )}
 
                 <div className="whitespace-pre-line font-normal">{m.content}</div>

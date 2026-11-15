@@ -1,6 +1,6 @@
 """
-FastAPI Application for AGROVERSE
-NASA Space Apps Challenge 2026 - Field Shift: Adapting Farms with NASA Data
+FastAPI Application for Sky2Soil
+Earth Observation Agricultural Intelligence Platform
 """
 
 import os
@@ -24,8 +24,8 @@ from assistant_service import AIAssistant
 init_db()
 
 app = FastAPI(
-    title="AGROVERSE API",
-    description="NASA Space Apps Challenge 2026 - Agricultural Intelligence Platform",
+    title="Sky2Soil API",
+    description="Earth Observation & Agricultural Intelligence Platform",
     version="1.0.0"
 )
 
@@ -68,6 +68,13 @@ class ScenarioRequest(BaseModel):
     temp_delta_c: float = 0.0
     soil_moisture_delta_pct: float = 0.0
 
+class UserCreate(BaseModel):
+    name: str
+    role: Optional[str] = "Farmer"
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    farm_name: Optional[str] = None
+
 # --- Helper Functions ---
 def get_farm_or_404(farm_id: str) -> Dict[str, Any]:
     conn = get_connection()
@@ -89,10 +96,49 @@ def get_farm_or_404(farm_id: str) -> Dict[str, Any]:
 def health_check():
     return {
         "status": "healthy",
-        "service": "AGROVERSE Backend",
+        "service": "Sky2Soil Backend",
         "nasa_integration": "Operational",
         "timestamp": datetime.utcnow().isoformat()
     }
+
+# 0. User Account Management
+@app.get("/api/users")
+def list_users():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users ORDER BY is_default DESC, created_at DESC")
+    rows = [dict(r) for r in cursor.fetchall()]
+    conn.close()
+    return rows
+
+@app.post("/api/users")
+def create_user(payload: UserCreate):
+    conn = get_connection()
+    cursor = conn.cursor()
+    name = payload.name.strip()
+    words = [w for w in name.split() if w]
+    initials = (words[0][0] + words[-1][0]).upper() if len(words) >= 2 else (name[:2].upper() if name else "U")
+    user_id = f"user-{int(datetime.utcnow().timestamp())}"
+    now = datetime.utcnow().isoformat()
+    cursor.execute("""
+    INSERT INTO users (id, name, role, initials, email, phone, farm_name, is_default, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        user_id,
+        name,
+        payload.role or "Farmer",
+        initials,
+        payload.email,
+        payload.phone,
+        payload.farm_name,
+        0,
+        now
+    ))
+    conn.commit()
+    cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+    row = dict(cursor.fetchone())
+    conn.close()
+    return row
 
 # 1. Farm Management
 @app.get("/api/farms")
@@ -283,7 +329,7 @@ async def export_farm_csv(farm_id: str):
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["AGROVERSE Farm Report", "NASA Space Apps Challenge 2026"])
+    writer.writerow(["Sky2Soil Farm Report", "Earth Observation Agriculture"])
     writer.writerow(["Farm Name", farm["name"]])
     writer.writerow(["Location", farm["location"]])
     writer.writerow(["Coordinates", f"{farm['latitude']}, {farm['longitude']}"])
@@ -313,7 +359,7 @@ async def export_farm_csv(farm_id: str):
         writer.writerow([c["name"], ev["score"], ev["suitability_category"], ev["water_demand"], ev["duration"]])
 
     response = Response(content=output.getvalue(), media_type="text/csv")
-    response.headers["Content-Disposition"] = f"attachment; filename=agroverse_farm_{farm_id}.csv"
+    response.headers["Content-Disposition"] = f"attachment; filename=sky_to_soil_farm_{farm_id}.csv"
     return response
 
 if __name__ == "__main__":

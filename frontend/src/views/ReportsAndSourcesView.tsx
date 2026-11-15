@@ -40,7 +40,7 @@ export const ReportsAndSourcesView: React.FC<ReportsAndSourcesViewProps> = ({
             NASA Earth Observations & Agricultural Sources
           </h2>
           <p className="text-neutral-600 text-sm mt-1 max-w-3xl">
-            AGROVERSE integrates genuine public Earth observation datasets and credible agronomic research institutes.
+            Sky2Soil integrates genuine public Earth observation datasets and credible agronomic research institutes.
           </p>
         </div>
 

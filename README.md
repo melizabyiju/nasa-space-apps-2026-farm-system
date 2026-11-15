@@ -1,7 +1,7 @@
-# AGROVERSE – NASA Space Apps Challenge 2026
-**Field Shift: Adapting Farms with NASA Data**
+# Sky2Soil – Earth Observation & Crop Intelligence
+**Field Shift: Adapting Farms with Satellite Data**
 
-AGROVERSE is a complete, modern agricultural intelligence platform that helps farmers and agronomists make climate-informed crop rotation decisions by synthesizing genuine NASA Earth observations, local soil characteristics, crop agronomic requirements, and farmer preferences.
+Sky2Soil is a complete, modern agricultural intelligence platform that helps farmers and agronomists make climate-informed crop rotation decisions by synthesizing genuine Earth observations, local soil characteristics, crop agronomic requirements, and farmer preferences.
 
 ---
 

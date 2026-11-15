@@ -59,15 +59,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Brand Header */}
       <div className="flex items-center gap-3 px-2 py-3 mb-3 border-b border-neutral-200/60 w-full shrink-0">
         <div className="w-10 h-10 rounded-2xl overflow-hidden shadow-md shadow-emerald-950/20 shrink-0 border border-emerald-500/20">
-          <img src="/favicon.svg" alt="AGROVERSE" className="w-full h-full object-cover" />
+          <img src="/favicon.svg" alt="Sky2Soil" className="w-full h-full object-cover" />
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <h1 className="font-extrabold text-lg text-emerald-950 tracking-tight flex items-center gap-1.5">
+            <h1 className="font-extrabold text-lg text-emerald-950 tracking-tight">
               {t.appName}
-              <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full border border-emerald-300/70">
-                NASA
-              </span>
             </h1>
             <p className="text-[11px] text-neutral-500 font-medium truncate">{t.appSubtitle}</p>
           </div>

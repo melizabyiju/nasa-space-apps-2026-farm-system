@@ -3,14 +3,19 @@ export type Language = 'en' | 'ml';
 export const translations = {
   en: {
     // App header & brand
-    appName: 'AGROVERSE',
-    appSubtitle: 'NASA Earth Observation & Crop Intelligence',
-    liveNasa: 'Live NASA Satellite Feed',
+    appName: 'Sky2Soil',
+    appSubtitle: 'Earth Observation & Crop Intelligence',
+    liveNasa: 'Live Satellite Feed',
     selectFarm: 'Selected Farm',
-    syncNasa: 'Sync NASA Data',
+    syncNasa: 'Sync Data',
     syncing: 'Syncing...',
     currentSeason: 'Season 2026',
     leadAgronomist: 'Farmer / Agronomist',
+    defaultAccount: 'Default User',
+    accounts: 'User Accounts',
+    createAccount: 'Create New Account',
+    switchAccount: 'Switch Account',
+    accountCreatedSuccess: 'Account created successfully!',
     
     // Navigation
     nav: {
@@ -60,7 +65,7 @@ export const translations = {
     soilTitle: 'Soil Moisture & Ground Health',
     soilDesc: 'Checks whether your soil has enough moisture for seeds to germinate and crops to thrive.',
     soilMoistureMeaning: 'Soil moisture is currently at a healthy level. Seeds can germinate easily without heavy initial pumping.',
-    soilDisclaimer: 'Note: NASA satellites measure ground moisture from space. Soil pH and nutrients come from your local agricultural soil test card.',
+    soilDisclaimer: 'Note: Satellites measure ground moisture from space. Soil pH and nutrients come from your local agricultural soil test card.',
 
     // Rotation Page
     rotationTitle: 'Smart Crop Rotation Plans',
@@ -92,14 +97,19 @@ export const translations = {
 
   ml: {
     // App header & brand
-    appName: 'അഗ്രോവേഴ്സ് (AGROVERSE)',
-    appSubtitle: 'നാസ ഉപഗ്രഹ & കാർഷിക വിവരങ്ങൾ',
-    liveNasa: 'നാസ ഉപഗ്രഹ വിവരങ്ങൾ തത്സമയം',
+    appName: 'Sky2Soil (സ്കൈ2സോയിൽ)',
+    appSubtitle: 'ഉപഗ്രഹ & കാർഷിക വിവരങ്ങൾ',
+    liveNasa: 'ഉപഗ്രഹ വിവരങ്ങൾ തത്സമയം',
     selectFarm: 'തിരഞ്ഞെടുത്ത കൃഷിയിടം',
-    syncNasa: 'നാസ വിവരങ്ങൾ പുതുക്കുക',
+    syncNasa: 'വിവരങ്ങൾ പുതുക്കുക',
     syncing: 'പുതുക്കുന്നു...',
     currentSeason: 'സീസൺ 2026',
     leadAgronomist: 'കർഷകൻ / കൃഷി ഓഫീസർ',
+    defaultAccount: 'സ്ഥിരസ്ഥിതി ഉപയോക്താവ്',
+    accounts: 'ഉപയോക്തൃ അക്കൗണ്ടുകൾ',
+    createAccount: 'പുതിയ അക്കൗണ്ട് ഉണ്ടാക്കുക',
+    switchAccount: 'അക്കൗണ്ട് മാറ്റുക',
+    accountCreatedSuccess: 'പുതിയ അക്കൗണ്ട് വിജയകരമായി സൃഷ്ടിച്ചു!',
 
     // Navigation
     nav: {
@@ -149,7 +159,7 @@ export const translations = {
     soilTitle: 'മണ്ണിലെ ഈർപ്പവും ആരോഗ്യവും',
     soilDesc: 'വിത്ത് മുളയ്ക്കാനും ചെടികൾ വാടാതിരിക്കാനും ആവശ്യത്തിന് ഈർപ്പം മണ്ണിൽ ഉണ്ടോ എന്ന് പരിശോധിക്കുന്നു.',
     soilMoistureMeaning: 'മണ്ണിൽ ആവശ്യത്തിന് ഈർപ്പമുണ്ട്. വിത്ത് നടാനും വേരുകൾ പടരാനും വളരെ അനുകൂലമായ സമയമാണിത്.',
-    soilDisclaimer: 'ശ്രദ്ധിക്കുക: നാസ ഉപഗ്രഹങ്ങൾ മുകളിലിരുന്ന് മണ്ണിലെ ഈർപ്പമാണ് അളക്കുന്നത്. മണ്ണിന്റെ pH, വളക്കൂറ് എന്നിവ പ്രാദേശിക മണ്ണ് പരിശോധന കാർഡിൽ നിന്നുള്ളതാണ്.',
+    soilDisclaimer: 'ശ്രദ്ധിക്കുക: ഉപഗ്രഹങ്ങൾ മുകളിലിരുന്ന് മണ്ണിലെ ഈർപ്പമാണ് അളക്കുന്നത്. മണ്ണിന്റെ pH, വളക്കൂറ് എന്നിവ പ്രാദേശിക മണ്ണ് പരിശോധന കാർഡിൽ നിന്നുള്ളതാണ്.',
 
     // Rotation Page
     rotationTitle: 'ലാഭകരമായ വിള പരിക്രമണ പദ്ധതികൾ',

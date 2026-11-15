@@ -1,6 +1,6 @@
 """
 Sky2Soil Agricultural Intelligence Assistant Engine
-Synthesizes NASA Earth observation data (POWER, SMAP, ECOSTRESS), farm soil characteristics,
+Synthesizes satellite Earth observation data (POWER, SMAP, ECOSTRESS), farm soil characteristics,
 and ICAR / Kerala Agricultural University (KAU) agronomic research to provide authoritative,
 practical, and scientifically validated agricultural guidance in both English and Malayalam.
 """
